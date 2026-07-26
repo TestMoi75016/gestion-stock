@@ -17,7 +17,7 @@ class Categorie(SQLModel, table=True):
     nom: str
     produits: list["Produit"] = Relationship(
         back_populates="categorie"
-    )  # list["Produit"] ça veut pour Python: tkt la table "Produit" n'est pas crée mais fait moi confiance ça arrive juste en dessous
+    )  # list["Produit"] ça veut pour Python: tkt la class "Produit" n'est pas crée mais fait moi confiance ça arrive juste en dessous
 
 
 # --- Table "fournisseurs" ---
@@ -30,7 +30,7 @@ class Fournisseur(SQLModel, table=True):
 
     produits: list["Produit"] = Relationship(
         back_populates="fournisseur"
-    )  # list["Produit"] ça veut pour Python: tkt la table "Produit" n'est pas crée mais fait moi confiance ça arrive juste en dessous
+    )  # list["Produit"] ça veut pour Python: tkt la class "Produit" n'est pas crée mais fait moi confiance ça arrive juste en dessous
 
 
 # --- Table "produits" ---
