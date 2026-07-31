@@ -1,7 +1,7 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from app.database import creer_tables
-from app.routes import produits, categories, fournisseurs
+from app.routes import produits, categories, fournisseurs, mouvements
 
 
 @asynccontextmanager  # décorateur: transforme la fonction en gestionnaire de cycle de vie (démarrage/arrêt de l'application)
@@ -18,6 +18,7 @@ app = FastAPI(title="Gestion de stock", lifespan=lifespan)
 app.include_router(produits.router)
 app.include_router(categories.router)
 app.include_router(fournisseurs.router)
+app.include_router(mouvements.router)
 
 
 @app.get("/")
