@@ -65,7 +65,7 @@ class Mouvement(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
     produit_id: int = Field(foreign_key="produits.id")  # obligatoire
     type: TypeMouvement  # "entree" ou "sortie"
-    quantite: int
+    quantite: int  # une valeur par ligne de mouvement.
     # default_factory (pas default !) : fonction appelée À CHAQUE création,
     # donc chaque mouvement reçoit l'heure de SON insertion.
     date: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
