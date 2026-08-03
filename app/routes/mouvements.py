@@ -7,6 +7,18 @@ from app.models import Produit, Mouvement, TypeMouvement
 router = APIRouter(prefix="/produits", tags=["Mouvements"])
 
 
+def calculer_stock(session: Session, produit_id: int) -> int:
+    # +quantite pour une entrée, -quantite pour une sortie, sommés en SQL.
+    signe = case(
+        (Mouvement.type == TypeMouvement.entree, Mouvement.quantite),
+        (Mouvement.type == TypeMouvement.sortie, -Mouvement.quantite),
+        else_=0,
+    )
+    statement = select(func.sum(signe)).where(Mouvement.produit_id == produit_id)
+    stock = session.exec(statement).one()
+    return stock or 0
+
+
 # -- l'URL dit : « crée un mouvement pour le produit {produit_id} --
 @router.post("/{produit_id}/mouvements", response_model=Mouvement)
 def creer_mouvement(
@@ -20,6 +32,17 @@ def creer_mouvement(
 
     if mouvement.quantite <= 0:
         raise HTTPException(status_code=400, detail="La quantité doit être positive")
+
+    if mouvement.type == TypeMouvement.sortie:
+        stock_actuel = calculer_stock(session, produit_id)
+        if mouvement.quantite > stock_actuel:
+            raise HTTPException(
+                status_code=400,
+                detail=(
+                    f"Stock insuffisant : stock actuel = {stock_actuel}, "
+                    f"quantité demandée = {mouvement.quantite}"
+                ),
+            )
 
     mouvement.produit_id = produit_id  # l'URL fait foi
     session.add(mouvement)
@@ -35,13 +58,5 @@ def lire_stock(produit_id: int, session: Session = Depends(get_session)):
     if produit is None:
         raise HTTPException(status_code=404, detail="Produit introuvable")
 
-    # +quantite pour une entrée, -quantite pour une sortie, sommés en SQL.
-    signe = case(
-        (Mouvement.type == TypeMouvement.entree, Mouvement.quantite),
-        (Mouvement.type == TypeMouvement.sortie, -Mouvement.quantite),
-        else_=0,
-    )
-    statement = select(func.sum(signe)).where(Mouvement.produit_id == produit_id)
-    stock = session.exec(statement).one()
-
-    return {"produit_id": produit_id, "stock": stock or 0}
+    stock = calculer_stock(session, produit_id)
+    return {"produit_id": produit_id, "stock": stock}
