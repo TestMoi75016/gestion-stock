@@ -41,6 +41,7 @@ class Produit(SQLModel, table=True):
     nom: str
     sku: str = Field(index=True, unique=True)  # référence unique du produit
     seuil_alerte: int = Field(default=0)  # niveau bas déclenchant l'alerte
+    prix: float = 0
 
     # Clés étrangères : chaque produit pointe vers UNE catégorie, UN fournisseur.
     categorie_id: int | None = Field(default=None, foreign_key="categories.id")

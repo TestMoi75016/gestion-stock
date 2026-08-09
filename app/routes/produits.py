@@ -37,7 +37,9 @@ def lire_alertes(session: Session = Depends(get_session)):
         select(Produit.id, Produit.nom, stock.label("stock"), Produit.seuil_alerte)
         .join(Mouvement, Mouvement.produit_id == Produit.id, isouter=True)
         .group_by(Produit.id)
-        .having(stock <= Produit.seuil_alerte)
+        .having(
+            stock <= Produit.seuil_alerte
+        )  # having = comme un where, WHERE filtre avant les calculs d'agrégation (SUM, COUNT, etc.).HAVING filtre après ces calculs.
     )
     resultats = session.exec(statement).all()
     return [
