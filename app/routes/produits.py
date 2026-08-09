@@ -3,7 +3,7 @@ from sqlalchemy import case, func
 from sqlmodel import Session, select
 
 from app.database import get_session
-from app.models import Mouvement, Produit, TypeMouvement
+from app.models import Mouvement, Produit, ProduitUpdate, TypeMouvement
 
 router = APIRouter(prefix="/produits", tags=["Produits"])
 
@@ -65,7 +65,7 @@ def lire_produit(produit_id: int, session: Session = Depends(get_session)):
 # ---route modifier un produit en particulier -
 @router.put("/{produit_id}", response_model=Produit)
 def modifier_produit(
-    produit_id: int, produit_maj: Produit, session: Session = Depends(get_session)
+    produit_id: int, produit_maj: ProduitUpdate, session: Session = Depends(get_session)
 ):
     produit = session.get(Produit, produit_id)
     if produit is None:

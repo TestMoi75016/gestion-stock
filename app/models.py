@@ -73,3 +73,20 @@ class Mouvement(SQLModel, table=True):
     note: str | None = None  # commentaire libre, optionnel
 
     produit: Produit | None = Relationship(back_populates="mouvements")
+
+
+# --- Schéma de mise à jour partielle de Produit (pas de table) ---
+class ProduitUpdate(SQLModel):
+    nom: str | None = None
+    sku: str | None = None
+    seuil_alerte: int | None = None
+    prix: float | None = None
+    categorie_id: int | None = None
+    fournisseur_id: int | None = None
+
+
+# --- Schéma de création de Mouvement (pas de table) ---
+class MouvementCreate(SQLModel):
+    type: TypeMouvement
+    quantite: int
+    note: str | None = None
