@@ -68,7 +68,7 @@ class Mouvement(SQLModel, table=True):
     type: TypeMouvement  # "entree" ou "sortie"
     quantite: int  # une valeur par ligne de mouvement.
     # default_factory (pas default !) : fonction appelée À CHAQUE création,
-    # donc chaque mouvement reçoit l'heure de SON insertion.
+    # donc chaque mouvement reçoit l'heure de SON insertion depuis la BDD.
     date: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     note: str | None = None  # commentaire libre, optionnel
 

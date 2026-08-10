@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import case, func
 from sqlmodel import Session, select
 from app.database import get_session
-from app.models import Produit, Mouvement, TypeMouvement
+from app.models import Produit, Mouvement, MouvementCreate, TypeMouvement
 
 router = APIRouter(prefix="/produits", tags=["Mouvements"])
 
@@ -23,28 +23,29 @@ def calculer_stock(session: Session, produit_id: int) -> int:
 @router.post("/{produit_id}/mouvements", response_model=Mouvement)
 def creer_mouvement(
     produit_id: int,
-    mouvement: Mouvement,
+    mouvement_data: MouvementCreate,
     session: Session = Depends(get_session),
 ):
     produit = session.get(Produit, produit_id)
     if produit is None:
         raise HTTPException(status_code=404, detail="Produit introuvable")
 
-    if mouvement.quantite <= 0:
+    if mouvement_data.quantite <= 0:
         raise HTTPException(status_code=400, detail="La quantité doit être positive")
 
-    if mouvement.type == TypeMouvement.sortie:
+    if mouvement_data.type == TypeMouvement.sortie:
         stock_actuel = calculer_stock(session, produit_id)
-        if mouvement.quantite > stock_actuel:
+        if mouvement_data.quantite > stock_actuel:
             raise HTTPException(
                 status_code=400,
                 detail=(
                     f"Stock insuffisant : stock actuel = {stock_actuel}, "
-                    f"quantité demandée = {mouvement.quantite}"
+                    f"quantité demandée = {mouvement_data.quantite}"
                 ),
             )
 
-    mouvement.produit_id = produit_id  # l'URL fait foi
+    # mouvement.produit_id = produit_id  # l'URL fait foi
+    mouvement = Mouvement(produit_id=produit_id, **mouvement_data.model_dump())
     session.add(mouvement)
     session.commit()
     session.refresh(mouvement)
