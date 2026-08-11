@@ -54,7 +54,11 @@ def lire_alertes(session: Session = Depends(get_session)):
 
 
 # ---route lister un produit en particulier -
-@router.get("/{produit_id}", response_model=Produit)
+@router.get(
+    "/{produit_id}",
+    response_model=Produit,
+    responses={404: {"description": "Produit introuvable"}},
+)
 def lire_produit(produit_id: int, session: Session = Depends(get_session)):
     produit = session.get(Produit, produit_id)
     if produit is None:
@@ -63,7 +67,11 @@ def lire_produit(produit_id: int, session: Session = Depends(get_session)):
 
 
 # ---route modifier un produit en particulier -
-@router.put("/{produit_id}", response_model=Produit)
+@router.put(
+    "/{produit_id}",
+    response_model=Produit,
+    responses={404: {"description": "Produit introuvable"}},
+)
 def modifier_produit(
     produit_id: int, produit_maj: ProduitUpdate, session: Session = Depends(get_session)
 ):
@@ -79,7 +87,10 @@ def modifier_produit(
 
 
 # ---route supprimer un produit en particulier -
-@router.delete("/{produit_id}")
+@router.delete(
+    "/{produit_id}",
+    responses={404: {"description": "Produit introuvable"}},
+)
 def supprimer_produit(produit_id: int, session: Session = Depends(get_session)):
     produit = session.get(Produit, produit_id)
     if produit is None:

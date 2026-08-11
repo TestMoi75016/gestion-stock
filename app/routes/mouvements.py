@@ -20,7 +20,14 @@ def calculer_stock(session: Session, produit_id: int) -> int:
 
 
 # -- l'URL dit : « crée un mouvement pour le produit {produit_id} --
-@router.post("/{produit_id}/mouvements", response_model=Mouvement)
+@router.post(
+    "/{produit_id}/mouvements",
+    response_model=Mouvement,
+    responses={
+        404: {"description": "Produit Introuvable"},
+        400: {"description": "La quantité doit être positive"},
+    },
+)
 def creer_mouvement(
     produit_id: int,
     mouvement_data: MouvementCreate,
@@ -53,7 +60,10 @@ def creer_mouvement(
 
 
 # -- l'URL dit : « donne le stock courant du produit {produit_id} --
-@router.get("/{produit_id}/stock")
+@router.get(
+    "/{produit_id}/stock",
+    responses={404: {"description": "Produit introuvable"}},
+)
 def lire_stock(produit_id: int, session: Session = Depends(get_session)):
     produit = session.get(Produit, produit_id)
     if produit is None:
