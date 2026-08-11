@@ -68,8 +68,25 @@ class Mouvement(SQLModel, table=True):
     type: TypeMouvement  # "entree" ou "sortie"
     quantite: int  # une valeur par ligne de mouvement.
     # default_factory (pas default !) : fonction appelée À CHAQUE création,
-    # donc chaque mouvement reçoit l'heure de SON insertion.
+    # donc chaque mouvement reçoit l'heure de SON insertion depuis la BDD.
     date: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     note: str | None = None  # commentaire libre, optionnel
 
     produit: Produit | None = Relationship(back_populates="mouvements")
+
+
+# --- Schéma de mise à jour partielle de Produit (pas de table) ---
+class ProduitUpdate(SQLModel):
+    nom: str | None = None
+    sku: str | None = None
+    seuil_alerte: int | None = None
+    prix: float | None = None
+    categorie_id: int | None = None
+    fournisseur_id: int | None = None
+
+
+# --- Schéma de création de Mouvement (pas de table) ---
+class MouvementCreate(SQLModel):
+    type: TypeMouvement
+    quantite: int
+    note: str | None = None

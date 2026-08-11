@@ -27,7 +27,14 @@ def lire_valeur_stock(session: Session = Depends(get_session)):
 
 
 # ---route lister les mouvements sur une période -
-@router.get("/mouvements")
+@router.get(
+    "/mouvements",
+    responses={
+        400: {
+            "description": "La date de début doit être antérieure ou égale à la date de fin."
+        }
+    },
+)
 def lire_mouvements(
     debut: datetime, fin: datetime, session: Session = Depends(get_session)
 ):
